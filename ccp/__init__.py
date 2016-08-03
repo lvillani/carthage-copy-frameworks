@@ -26,6 +26,7 @@
 
 from __future__ import print_function
 
+import argparse
 import os
 import os.path
 import subprocess
@@ -34,9 +35,16 @@ import sys
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
-
 def main():
     sanity_check()
+
+    parser = argparse.ArgumentParser(description='Exclude dependencies')
+    parser.add_argument('-x','--exclude', nargs='+', help='Exclude dependencies from being copied', required=False)
+    args = parser.parse_args()
+    if args.exclude is not None:
+        excluded_frameworks = args.exclude
+    else:
+        excluded_frameworks = []
 
     built_products_dir = os.environ["BUILT_PRODUCTS_DIR"]
     frameworks_folder_path = os.environ["FRAMEWORKS_FOLDER_PATH"]
@@ -45,7 +53,7 @@ def main():
     dest = os.path.join(built_products_dir, frameworks_folder_path)
     frameworks_dir = os.path.abspath(os.path.join(srcroot, "Carthage", "Build", "iOS"))
 
-    frameworks = [f for f in os.listdir(frameworks_dir) if f.endswith(".framework")]
+    frameworks = [f for f in os.listdir(frameworks_dir) if f.endswith(".framework") and f not in excluded_frameworks]
 
     # Skip speed-up trick for Release builds.
     if os.environ["CONFIGURATION"] != "Release":
@@ -56,7 +64,6 @@ def main():
     # Do we have anything to do?
     if not frameworks:
         print("Not copying any framework. Perform a clean build to copy them again.")
-
         return
     else:
         print("Copying:\n    " + "\n    ".join(frameworks))
@@ -90,7 +97,6 @@ def sanity_check():
 
 def already_there(dest, framework_name):
     return os.path.isdir(os.path.join(dest, framework_name))
-
 
 if __name__ == "__main__":
     main()

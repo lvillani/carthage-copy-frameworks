@@ -7,13 +7,16 @@ from setuptools import setup
 
 HERE = path.abspath(path.dirname(__file__))
 
-with open_f(path.join(HERE, "DESCRIPTION.rst"), encoding="utf-8") as f:
-    LONG_DESCRIPTION = f.read()
+try:
+    with open_f(path.join(HERE, "DESCRIPTION.rst"), encoding="utf-8") as f:
+        LONG_DESCRIPTION = f.read()
+except IOError:
+    LONG_DESCRIPTION = ""
 
 setup(
     name="carthage-copy-frameworks",
     version="1.0.0",
-    description="Keyring integration and local execution wrappers for Ansible",
+    description="carthage-copy-frameworks is an helper script that automatically copies every framework below Carthage/Build/iOS",
     long_description=LONG_DESCRIPTION,
     url="https://github.com/lvillani/carthage-copy-frameworks",
     author="Lorenzo Villani",
