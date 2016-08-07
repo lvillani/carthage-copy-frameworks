@@ -32,15 +32,19 @@ import os.path
 import subprocess
 import sys
 
-
 HERE = os.path.abspath(os.path.dirname(__file__))
+
 
 def main():
     sanity_check()
 
-    parser = argparse.ArgumentParser(description='Exclude dependencies')
-    parser.add_argument('-x','--exclude', nargs='+', help='Exclude dependencies from being copied', required=False)
+    parser = argparse.ArgumentParser(description="Exclude dependencies")
+    parser.add_argument(
+        "-x", "--exclude", nargs="+",
+        help="Exclude dependencies from being copied", required=False)
+
     args = parser.parse_args()
+
     if args.exclude is not None:
         excluded_frameworks = args.exclude
     else:
@@ -53,7 +57,8 @@ def main():
     dest = os.path.join(built_products_dir, frameworks_folder_path)
     frameworks_dir = os.path.abspath(os.path.join(srcroot, "Carthage", "Build", "iOS"))
 
-    frameworks = [f for f in os.listdir(frameworks_dir) if f.endswith(".framework") and f not in excluded_frameworks]
+    frameworks = [f for f in os.listdir(frameworks_dir)
+                  if f.endswith(".framework") and f not in excluded_frameworks]
 
     # Skip speed-up trick for Release builds.
     if os.environ["CONFIGURATION"] != "Release":
@@ -97,6 +102,7 @@ def sanity_check():
 
 def already_there(dest, framework_name):
     return os.path.isdir(os.path.join(dest, framework_name))
+
 
 if __name__ == "__main__":
     main()
