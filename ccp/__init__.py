@@ -25,6 +25,7 @@
 #
 
 from __future__ import print_function
+from collections import namedtuple
 
 import argparse
 import os
@@ -34,14 +35,19 @@ import sys
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
+Framework = namedtuple('Framework', ['name', 'path'])
 
 def main():
     sanity_check()
 
-    parser = argparse.ArgumentParser(description="Exclude dependencies")
+    parser = argparse.ArgumentParser(description="Argument Parser")
     parser.add_argument(
         "-x", "--exclude", nargs="+",
         help="Exclude dependencies from being copied", required=False)
+
+    parser.add_argument(
+        "-c", "--carthage", nargs="+",
+        help="Additional Carthage Binary Folders", required=False)
 
     args = parser.parse_args()
 
@@ -50,6 +56,11 @@ def main():
     else:
         excluded_frameworks = []
 
+    if args.carthage is not None:
+        additional_carthage_folders = args.carthage
+    else:
+        additional_carthage_folders = []
+
     built_products_dir = os.environ["BUILT_PRODUCTS_DIR"]
     frameworks_folder_path = os.environ["FRAMEWORKS_FOLDER_PATH"]
     srcroot = os.environ["SRCROOT"]
@@ -57,9 +68,16 @@ def main():
     dest = os.path.join(built_products_dir, frameworks_folder_path)
     frameworks_dir = os.path.abspath(os.path.join(srcroot, "Carthage", "Build", "iOS"))
 
-    frameworks = [f for f in os.listdir(frameworks_dir)
-                  if f.endswith(".framework") and f not in excluded_frameworks]
+    additional_carthage_folders.append(frameworks_dir)
 
+    frameworks = []
+
+    for folder in additional_carthage_folders:
+        for framework in [f for f in os.listdir(folder)
+                  if f.endswith(".framework") and f not in excluded_frameworks]:
+
+            frameworks.append(Framework(name=framework,path=os.path.join(folder, framework)))
+                
     # Skip speed-up trick for Release builds.
     if os.environ["CONFIGURATION"] != "Release":
         frameworks = [f for f in frameworks if not already_there(dest, f)]
@@ -71,13 +89,13 @@ def main():
         print("Not copying any framework. Perform a clean build to copy them again.")
         return
     else:
-        print("Copying:\n    " + "\n    ".join(frameworks))
+        print("Copying:\n    " + "\n    ".join([f.name for f in frameworks]))
 
     # Export environment variables needed by Carthage
     os.environ["SCRIPT_INPUT_FILE_COUNT"] = str(len(frameworks))
 
     for i, framework in enumerate(frameworks):
-        os.environ["SCRIPT_INPUT_FILE_" + str(i)] = os.path.join(frameworks_dir, framework)
+        os.environ["SCRIPT_INPUT_FILE_" + str(i)] = framework.path
 
     subprocess.check_call(["carthage", "copy-frameworks"])
 
@@ -100,8 +118,8 @@ def sanity_check():
             sys.exit(1)
 
 
-def already_there(dest, framework_name):
-    return os.path.isdir(os.path.join(dest, framework_name))
+def already_there(dest, framework):
+    return os.path.isdir(os.path.join(dest, framework.name))
 
 
 if __name__ == "__main__":
