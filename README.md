@@ -18,20 +18,7 @@ As the name implies, this is meant to be used in iOS development, alongside
 
 # Installation
 
-If you are on OS X and have Homebrew's Python:
-
-    pip install carthage-copy-frameworks
-
-Otherwise:
-
-    pip install --user carthage-copy-frameworks
-
-Then make sure to add the local pip's `bin` directory to the `$PATH`. Since it is different on each
-platform, please refer to its documentation.
-
-Otherwise, if you're feeling a badass and want to `sudo` your way out, then run:
-
-    sudo pip install carthage-copy-frameworks
+    brew install lvillani/tap/carthage-copy-frameworks
 
 
 # Usage
