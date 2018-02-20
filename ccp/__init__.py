@@ -61,6 +61,19 @@ def main():
     else:
         additional_carthage_folders = []
 
+    # Check for additional excluded frameworks defined in input variables
+    script_input_file_count = int(os.environ["SCRIPT_INPUT_FILE_COUNT"])
+    print("Found " + str(script_input_file_count) + " input files, treat as frameworks to exclude")
+    for i in range(0, script_input_file_count):
+        script_input_file_pos = "SCRIPT_INPUT_FILE_" + str(i)
+        script_input_file = os.environ[script_input_file_pos]
+        framework_to_exclude = os.path.basename(script_input_file)
+        print("Framework " + framework_to_exclude + " will be excluded.")
+        excluded_frameworks.append(framework_to_exclude)
+        # Reset variable
+        del os.environ[script_input_file_pos]
+    del os.environ["SCRIPT_INPUT_FILE_COUNT"]
+
     built_products_dir = os.environ["BUILT_PRODUCTS_DIR"]
     frameworks_folder_path = os.environ["FRAMEWORKS_FOLDER_PATH"]
     srcroot = os.environ["SRCROOT"]
@@ -77,7 +90,7 @@ def main():
                   if f.endswith(".framework") and f not in excluded_frameworks]:
 
             frameworks.append(Framework(name=framework,path=os.path.join(folder, framework)))
-                
+
     # Skip speed-up trick for Release builds.
     if os.environ["CONFIGURATION"] != "Release":
         frameworks = [f for f in frameworks if not already_there(dest, f)]
