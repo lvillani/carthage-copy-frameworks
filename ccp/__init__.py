@@ -91,24 +91,21 @@ def main():
 
             frameworks.append(Framework(name=framework,path=os.path.join(folder, framework)))
 
-    # Skip speed-up trick for Release builds.
-    if os.environ["CONFIGURATION"] != "Release":
-        frameworks = [f for f in frameworks if not already_there(dest, f)]
-    else:
-        print("This is a release build, skipping presence checks.")
-
     # Do we have anything to do?
     if not frameworks:
-        print("Not copying any framework. Perform a clean build to copy them again.")
+        print("No frameworks built, so nothing to copy.")
         return
     else:
-        print("Copying:\n    " + "\n    ".join([f.name for f in frameworks]))
+        print("Piping to 'carthage copy-frameworks':\n    " + "\n    ".join([f.name for f in frameworks]))
 
-    # Export environment variables needed by Carthage
+    # Export environment variables needed by Carthage as described here:
+    # https://github.com/Carthage/Carthage#if-youre-building-for-ios-tvos-or-watchos
     os.environ["SCRIPT_INPUT_FILE_COUNT"] = str(len(frameworks))
+    os.environ["SCRIPT_OUTPUT_FILE_COUNT"] = str(len(frameworks))
 
     for i, framework in enumerate(frameworks):
         os.environ["SCRIPT_INPUT_FILE_" + str(i)] = framework.path
+        os.environ["SCRIPT_OUTPUT_FILE_" + str(i)] = "$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/" + framework.name
 
     subprocess.check_call(["carthage", "copy-frameworks"])
 
@@ -129,10 +126,6 @@ def sanity_check():
                 print(line)
 
             sys.exit(1)
-
-
-def already_there(dest, framework):
-    return os.path.isdir(os.path.join(dest, framework.name))
 
 
 if __name__ == "__main__":
