@@ -16,7 +16,7 @@ except IOError:
 
 setup(
     name="carthage-copy-frameworks",
-    version="1.1.0",
+    version="1.2.0",
     description="carthage-copy-frameworks is an helper script that automatically copies every framework below Carthage/Build/iOS",
     long_description=LONG_DESCRIPTION,
     url="https://github.com/lvillani/carthage-copy-frameworks",
