@@ -1,8 +1,7 @@
 carthage-copy-frameworks
 ========================
 
-[![PyPI Version](https://img.shields.io/pypi/v/carthage-copy-frameworks.svg)](https://pypi.python.org/pypi/carthage-copy-frameworks)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/carthage-copy-frameworks.svg)](https://pypi.python.org/pypi/carthage-copy-frameworks)
+![Version](https://img.shields.io/badge/version-v1.2.0-blue.svg)
 [![MIT License](https://img.shields.io/badge/license-mit-blue.svg)](http://choosealicense.com/licenses/mit/)
 
 
