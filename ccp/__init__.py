@@ -35,19 +35,28 @@ import sys
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
-Framework = namedtuple('Framework', ['name', 'path'])
+Framework = namedtuple("Framework", ["name", "path"])
+
 
 def main():
     sanity_check()
 
     parser = argparse.ArgumentParser(description="Argument Parser")
     parser.add_argument(
-        "-x", "--exclude", nargs="+",
-        help="Exclude dependencies from being copied", required=False)
+        "-x",
+        "--exclude",
+        nargs="+",
+        help="Exclude dependencies from being copied",
+        required=False,
+    )
 
     parser.add_argument(
-        "-c", "--carthage", nargs="+",
-        help="Additional Carthage Binary Folders", required=False)
+        "-c",
+        "--carthage",
+        nargs="+",
+        help="Additional Carthage Binary Folders",
+        required=False,
+    )
 
     args = parser.parse_args()
 
@@ -63,7 +72,11 @@ def main():
 
     # Check for additional excluded frameworks defined in input variables
     script_input_file_count = int(os.environ["SCRIPT_INPUT_FILE_COUNT"])
-    print("Found " + str(script_input_file_count) + " input files, treat as frameworks to exclude")
+    print(
+        "Found "
+        + str(script_input_file_count)
+        + " input files, treat as frameworks to exclude"
+    )
     for i in range(0, script_input_file_count):
         script_input_file_pos = "SCRIPT_INPUT_FILE_" + str(i)
         script_input_file = os.environ[script_input_file_pos]
@@ -86,17 +99,25 @@ def main():
     frameworks = []
 
     for folder in additional_carthage_folders:
-        for framework in [f for f in os.listdir(folder)
-                  if f.endswith(".framework") and f not in excluded_frameworks]:
+        for framework in [
+            f
+            for f in os.listdir(folder)
+            if f.endswith(".framework") and f not in excluded_frameworks
+        ]:
 
-            frameworks.append(Framework(name=framework,path=os.path.join(folder, framework)))
+            frameworks.append(
+                Framework(name=framework, path=os.path.join(folder, framework))
+            )
 
     # Do we have anything to do?
     if not frameworks:
         print("No frameworks built, so nothing to copy.")
         return
     else:
-        print("Piping to 'carthage copy-frameworks':\n    " + "\n    ".join([f.name for f in frameworks]))
+        print(
+            "Piping to 'carthage copy-frameworks':\n    "
+            + "\n    ".join([f.name for f in frameworks])
+        )
 
     # Export environment variables needed by Carthage as described here:
     # https://github.com/Carthage/Carthage#if-youre-building-for-ios-tvos-or-watchos
@@ -105,7 +126,9 @@ def main():
 
     for i, framework in enumerate(frameworks):
         os.environ["SCRIPT_INPUT_FILE_" + str(i)] = framework.path
-        os.environ["SCRIPT_OUTPUT_FILE_" + str(i)] = "$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/" + framework.name
+        os.environ["SCRIPT_OUTPUT_FILE_" + str(i)] = (
+            "$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/" + framework.name
+        )
 
     subprocess.check_call(["carthage", "copy-frameworks"])
 

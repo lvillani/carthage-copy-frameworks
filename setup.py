@@ -33,9 +33,5 @@ setup(
     ],
     keywords="apple build carthage helper ios",
     packages=["ccp"],
-    entry_points={
-        "console_scripts": [
-            "carthage-copy-frameworks=ccp:main",
-        ],
-    },
+    entry_points={"console_scripts": ["carthage-copy-frameworks=ccp:main"]},
 )
