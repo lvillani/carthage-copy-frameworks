@@ -1,5 +1,4 @@
-carthage-copy-frameworks
-========================
+# carthage-copy-frameworks
 
 ![Version](https://img.shields.io/badge/version-v1.2.0-blue.svg)
 [![MIT License](https://img.shields.io/badge/license-mit-blue.svg)](http://choosealicense.com/licenses/mit/)
