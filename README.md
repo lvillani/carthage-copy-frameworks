@@ -24,23 +24,18 @@ As the name implies, this is meant to be used in iOS development, alongside
 1. Open your target configuration.
 2. Click on "Build Phases".
 3. Click on the plus ("+") button.
+4. Click on "New Run Script Phase"
 
 ![Step 1](images/step1.png)
 
------
-
-Click on "New Run Script Phase"
-
-![Step 2](images/step2.png)
-
------
+----
 
 In the script text field type `carthage-copy-frameworks`, as shown in the picture.
 
-![Step 3](images/step3.png)
+![Step 2](images/step2.png)
 
 
 # Notes
 
-Frameworks are not copied over and over again. This means that updated dependencies might not be
-picked up until you perform a clean build.
+Frameworks are copied only once. There are no checks to copy a framework again once it changes. This
+means that updated dependencies might not be picked up until you perform a clean build.

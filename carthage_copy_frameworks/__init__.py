@@ -1,5 +1,4 @@
-#!/usr/bin/env python2.7
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 #
 # The MIT License (MIT)
 #
@@ -24,14 +23,14 @@
 # SOFTWARE.
 #
 
-from __future__ import print_function
-from collections import namedtuple
-
 import argparse
 import os
 import os.path
 import subprocess
 import sys
+from collections import namedtuple
+
+__version__ = "2.0.0"
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -41,24 +40,9 @@ Framework = namedtuple("Framework", ["name", "path"])
 def main():
     sanity_check()
 
-    parser = argparse.ArgumentParser(description="Argument Parser")
-    parser.add_argument(
-        "-x",
-        "--exclude",
-        nargs="+",
-        help="Exclude dependencies from being copied",
-        required=False,
-    )
+    args = parse_args()
 
-    parser.add_argument(
-        "-c",
-        "--carthage",
-        nargs="+",
-        help="Additional Carthage Binary Folders",
-        required=False,
-    )
-
-    args = parser.parse_args()
+    print("carthage-copy-frameworks v{}".format(__version__))
 
     if args.exclude is not None:
         excluded_frameworks = args.exclude
@@ -72,11 +56,13 @@ def main():
 
     # Check for additional excluded frameworks defined in input variables
     script_input_file_count = int(os.environ["SCRIPT_INPUT_FILE_COUNT"])
+
     print(
-        "Found "
-        + str(script_input_file_count)
-        + " input files, treat as frameworks to exclude"
+        "Found",
+        script_input_file_count,
+        "input files to be treated as frameworks to exclude",
     )
+
     for i in range(0, script_input_file_count):
         script_input_file_pos = "SCRIPT_INPUT_FILE_" + str(i)
         script_input_file = os.environ[script_input_file_pos]
@@ -87,11 +73,7 @@ def main():
         del os.environ[script_input_file_pos]
     del os.environ["SCRIPT_INPUT_FILE_COUNT"]
 
-    built_products_dir = os.environ["BUILT_PRODUCTS_DIR"]
-    frameworks_folder_path = os.environ["FRAMEWORKS_FOLDER_PATH"]
     srcroot = os.environ["SRCROOT"]
-
-    dest = os.path.join(built_products_dir, frameworks_folder_path)
     frameworks_dir = os.path.abspath(os.path.join(srcroot, "Carthage", "Build", "iOS"))
 
     additional_carthage_folders.append(frameworks_dir)
@@ -104,7 +86,6 @@ def main():
             for f in os.listdir(folder)
             if f.endswith(".framework") and f not in excluded_frameworks
         ]:
-
             frameworks.append(
                 Framework(name=framework, path=os.path.join(folder, framework))
             )
@@ -149,6 +130,27 @@ def sanity_check():
                 print(line)
 
             sys.exit(1)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Argument Parser")
+    parser.add_argument(
+        "-x",
+        "--exclude",
+        nargs="+",
+        help="Exclude dependencies from being copied",
+        required=False,
+    )
+
+    parser.add_argument(
+        "-c",
+        "--carthage",
+        nargs="+",
+        help="Additional Carthage Binary Folders",
+        required=False,
+    )
+
+    return parser.parse_args()
 
 
 if __name__ == "__main__":
