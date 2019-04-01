@@ -10,9 +10,6 @@
 framework below `Carthage/Build/iOS`. This way you can avoid [the official, error prone,
 process](https://github.com/Carthage/Carthage#if-youre-building-for-ios-tvos-or-watchos).
 
-As the name implies, this is meant to be used in iOS development, alongside
-[Carthage](https://github.com/Carthage/Carthage).
-
 
 # Installation
 
